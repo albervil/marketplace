@@ -2,36 +2,42 @@
     {
         "id": 1,
         "email": "user1@finland.fi",
+        "password": "test1FI",
         "country": "FI",
         "currency": "EUR"
     },
     {
         "id": 2,
         "email": "user2@finland.fi",
+        "password": "test2FI",
         "country": "FI",
         "currency": "EUR"
     },
     {
         "id": 3,
         "email": "user3@finland.fi",
+        "password": "test3FI",
         "country": "FI",
         "currency": "EUR"
     },
     {
         "id": 11,
         "email": "user1@denmark.dk",
+        "password": "test1DK",
         "country": "DK",
         "currency": "DKK"
     },
     {
         "id": 12,
-        "email": "user1@denmark.dk",
+        "email": "user2@denmark.dk",
+        "password": "test2DK",
         "country": "DK",
         "currency": "DKK"
     },
     {
         "id": 13,
-        "email": "user1@denmark.dk",
+        "email": "user3@denmark.dk",
+        "password": "test3DK",
         "country": "DK",
         "currency": "DKK"
     }
