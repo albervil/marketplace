@@ -1,0 +1,2 @@
+class LikeOwnItemException(Exception):
+    pass

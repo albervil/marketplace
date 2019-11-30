@@ -1,0 +1,110 @@
+[
+    {
+        "id": 1,
+        "user": 1,
+        "description": "Red coat",
+        "price": 35.00
+    },
+    {
+        "id": 2,
+        "user": 2,
+        "description": "Leather jacket",
+        "price": 25.00
+    },
+    {
+        "id": 3,
+        "user": 3,
+        "description": "High-heel shoes",
+        "price": 16.00
+    },
+    {
+        "id": 4,
+        "user": 1,
+        "description": "Hawaiian shirt",
+        "price": 9.95
+    },
+    {
+        "id": 5,
+        "user": 2,
+        "description": "Star wars t-shirt",
+        "price": 20.00
+    },
+    {
+        "id": 6,
+        "user": 3,
+        "description": "Tank top",
+        "price": 6.50
+    },
+    {
+        "id": 7,
+        "user": 1,
+        "description": "Summer blouse",
+        "price": 9.95
+    },
+    {
+        "id": 8,
+        "user": 2,
+        "description": "VANS Sweatshirt",
+        "price": 20.00
+    },
+    {
+        "id": 9,
+        "user": 3,
+        "description": "Sports leggings",
+        "price": 7.00
+    },
+    {
+        "id": 10,
+        "user": 11,
+        "description": "RayBan Sunglasses",
+        "price": 300.00
+    },
+    {
+        "id": 11,
+        "user": 12,
+        "description": "Longchamp handbag",
+        "price": 2999.00
+    },
+    {
+        "id": 12,
+        "user": 13,
+        "description": "Strappy sandals",
+        "price": 350.00
+    },
+    {
+        "id": 13,
+        "user": 11,
+        "description": "Basketball shirt",
+        "price": 279.95
+    },
+    {
+        "id": 14,
+        "user": 12,
+        "description": "Party dress",
+        "price": 560.00
+    },
+    {
+        "id": 15,
+        "user": 13,
+        "description": "Winter parka",
+        "price": 380.00
+    },
+    {
+        "id": 16,
+        "user": 11,
+        "description": "Nike trainers",
+        "price": 495.00
+    },
+    {
+        "id": 17,
+        "user": 12,
+        "description": "Striped scarf",
+        "price": 159.00
+    },
+    {
+        "id": 18,
+        "user": 13,
+        "description": "Woolen hat",
+        "price": 99.00
+    }
+]
