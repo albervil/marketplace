@@ -1,3 +1,4 @@
+import os
 from flask import Flask, jsonify
 from flask_restplus import Api, Resource, fields
 from flask_jwt_extended import (
@@ -11,7 +12,7 @@ import services.product_service as Products
 import services.users_service as Users
 
 app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = 'super-secret'  # Change this!
+app.config['JWT_SECRET_KEY'] = os.environ['APP_SECRET']
 jwt = JWTManager(app)
 
 api = Api(app, version='1.0')
