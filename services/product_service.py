@@ -18,7 +18,6 @@ def feed(user, filters, sorting):
 
     if sorting['sort']:
         desc_sort = sorting['order'] is not None and sorting['order'] == 'DESC' 
-        print(sort_field)
         return sorted(feed, key=lambda prod: prod[sort_field], reverse=desc_sort)
     else:
         return feed
@@ -31,7 +30,7 @@ def like(user, product):
     if user['id'] == product['user']:
         raise LikeOwnItemException()
 
-    if id in likes.keys():
+    if product['id'] in likes.keys():
         likes[product['id']].add(user['id'])
     else:
         likes[product['id']] = {user['id']}

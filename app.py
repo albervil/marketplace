@@ -27,16 +27,19 @@ login_fields = api.model('Resource', {
 @login.expect(login_fields)
 class Login(Resource):
     def post(self):
-        user = Users.authenticate(api.payload)
+        try:
+            user = Users.authenticate(api.payload)
 
-        if user:
-            access_token = create_access_token(identity=user['id'])
-            return {
-                "access_token": access_token
-            }
-        else:
-            return 'Email or password did not match any registered user', 401
-        
+            if user:
+                access_token = create_access_token(identity=user['id'])
+                return {
+                    "access_token": access_token
+                }
+            else:
+                return 'The credentials provided were invalid', 401
+        except StopIteration:
+            return 'No user with those credentials was found', 401
+
 
 header_parser = api.parser()
 header_parser.add_argument('Authorization', location='headers')
