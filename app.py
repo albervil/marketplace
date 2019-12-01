@@ -16,14 +16,17 @@ jwt = JWTManager(app)
 
 api = Api(app, version='1.0')
 
-login = api.namespace('login', description="Logging in")
+login = api.namespace('login', description="Logging in and obtaining access token")
 products = api.namespace('products', description='Products API')
 
 login_fields = api.model('Resource', {
-    'email': fields.String,
-    'password': fields.String,
+    'email': fields.String(description="The user's email", example="user1@finland.fi"),
+    'password': fields.String(description="The user's password", example="test1FI")
 })
 @login.route("/")
+@login.doc(
+    responses={200: 'Access token for the user', 401: 'Unauthorized'}
+)
 @login.expect(login_fields)
 class Login(Resource):
     def post(self):
@@ -42,10 +45,12 @@ class Login(Resource):
 
 
 header_parser = api.parser()
-header_parser.add_argument('Authorization', location='headers')
+header_parser.add_argument('Authorization', help='Bearer \{Token\}', location='headers')
 
 @products.route("/")
-@products.expect(header_parser)
+@products.doc(
+    responses={200: 'The product feed for the user'}
+)
 class Feed(Resource):
     filters_parser = api.parser()
     filters_parser.add_argument('country', help='Country to filter by')
@@ -56,7 +61,7 @@ class Feed(Resource):
     sorting_parser.add_argument('sort', help='Criteria to sort by (price or likes)', choices=('price', 'likes'),)
     sorting_parser.add_argument('order', help='Order to sort by (ASC or DESC)', choices=('ASC', 'DESC'),)
 
-    @products.expect(filters_parser, sorting_parser)
+    @products.expect(header_parser, filters_parser, sorting_parser)
     @jwt_required
     def get(self):
         user_id = get_jwt_identity();
@@ -68,6 +73,10 @@ class Feed(Resource):
         return Products.feed(user, filters, sorting)
 
 @products.route("/<int:id>")
+@products.doc(
+    params={'id': 'Product ID'},
+    responses={200: 'The requested product', 404: 'Not Found'}
+)
 @products.expect(header_parser)
 class Product(Resource):
 
@@ -82,6 +91,14 @@ class Product(Resource):
             return 'Not Found', 404
 
 @products.route("/<int:id>/like")
+@products.doc(
+    params={'id': 'Product ID'},
+    responses={
+        200: 'The product with the computed like',
+        400: 'Bad Request: Cannot like own items',
+        404: 'Not Found'
+    }
+)
 @products.expect(header_parser)
 class Like(Resource):
     
