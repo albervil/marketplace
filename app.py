@@ -12,7 +12,13 @@ import services.product_service as Products
 import services.users_service as Users
 
 app = Flask(__name__)
-app.config['JWT_SECRET_KEY'] = os.environ['APP_SECRET']
+
+if 'APP_SECRET' in os.environ:
+    app.config['JWT_SECRET_KEY'] = os.environ['APP_SECRET']
+else:
+    # Just a random string to run the application e.g. locally
+    app.config['JWT_SECRET_KEY'] = os.urandom(12)
+
 jwt = JWTManager(app)
 
 api = Api(app, version='1.0')
@@ -118,4 +124,4 @@ class Like(Resource):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=False)

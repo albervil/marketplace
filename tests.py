@@ -91,14 +91,28 @@ class TestEndpoints(unittest.TestCase):
         self.assertAlmostEqual(product['price'], 279.95 / 7.4713, 0)
         self.assertEqual(product['likes'], 0)
 
+    def test_get_product_404(self):
+        response = self.app.get(
+            '/products/37',
+            headers={"Authorization": "Bearer " + self.access_token}
+        )
+        self.assertEqual(response.status_code, 404)
+
     def test_like_product(self):
         response = self.app.post(
-            '/products/13/like', 
+            '/products/13/like',
             headers={"Authorization": "Bearer " + self.access_token}
         )
         self.assertEqual(response.status_code, 200)
         product = json.loads(response.data)
         self.assertEqual(product['likes'], 1)
+
+    def test_like_product_404(self):
+        response = self.app.post(
+            '/products/37/like',
+            headers={"Authorization": "Bearer " + self.access_token}
+        )
+        self.assertEqual(response.status_code, 404)
 
     def test_like_own_product_error(self):
         response = self.app.post(
