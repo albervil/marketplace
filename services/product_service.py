@@ -1,7 +1,7 @@
 import json
 import services.users_service as Users
 from exception.restrictions import LikeOwnItemException
-from services.currency_conversion_service import convert_currency_base_eur
+from services.currency_conversion_service import convert
 
 likes = {}
 with open('resources/products.json') as f:
@@ -45,8 +45,8 @@ def extend(product, buyer):
     convert_from_eur = (product_currency == 'EUR')
 
     price = product['price'] if buyer['currency'] == product_currency \
-                            else convert_currency_base_eur(
-                                product['price'], product_currency, convert_from_eur
+                            else convert(
+                                product['price'], product_currency, buyer['currency']
                             ) 
 
     result = product.copy()
