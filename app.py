@@ -37,6 +37,9 @@ login_fields = api.model('Resource', {
 @login.expect(login_fields)
 class Login(Resource):
     def post(self):
+        """
+        Sign in and get an authorization token.
+        """
         try:
             user = Users.authenticate(api.payload)
 
@@ -71,6 +74,9 @@ class Feed(Resource):
     @products.expect(header_parser, filters_parser, sorting_parser)
     @jwt_required
     def get(self):
+        """
+        Shows the product feed for the user.
+        """
         user_id = get_jwt_identity();
         user = Users.get(user_id)
 
@@ -89,6 +95,9 @@ class Product(Resource):
 
     @jwt_required
     def get(self, id):
+        """
+        Shows details of an individual product.
+        """
         user_id = get_jwt_identity();
         user = Users.get(user_id)
 
@@ -111,6 +120,9 @@ class Like(Resource):
     
     @jwt_required
     def post(self, id):
+        """
+        Likes the selected product.
+        """
         user_id = get_jwt_identity();
         user = Users.get(user_id)
 
