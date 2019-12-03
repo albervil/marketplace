@@ -23,6 +23,9 @@ jwt = JWTManager(app)
 
 api = Api(app, version='1.0')
 
+# To fix dumb Flask bug that causes Error 500 if endpoints are called without authorization header
+jwt._set_error_handler_callbacks(api)
+
 login = api.namespace('login', description="Logging in and obtaining access token")
 products = api.namespace('products', description='Products API')
 
