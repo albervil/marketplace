@@ -2,13 +2,26 @@ import os
 import unittest
 from app import app
 import json
+from flask_migrate import migrate, upgrade
+from models.models import Product, User, Like, db as models_db
+from populate import populatedb
+
+def setUpModule():
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite://'
+    app.config['TESTING'] = True
+    app.config['DEBUG'] = True
+    app.config['JWT_SECRET_KEY'] = 'TESTING'
+
+    with app.app_context():
+        models_db.create_all()
+        populatedb()
+
+def tearDownModule():
+    with app.app_context():
+        models_db.drop_all()
 
 class TestAuth(unittest.TestCase):
     def setUp(self):
-        app.config['TESTING'] = True
-        app.config['DEBUG'] = True
-        app.config['JWT_SECRET_KEY'] = 'TESTING'
-
         self.app = app.test_client()
 
     def tearDown(self):
@@ -16,24 +29,24 @@ class TestAuth(unittest.TestCase):
 
     def test_login_success(self):
         response = self.app.post(
-            '/login/', 
-            data=json.dumps(dict(email="user1@finland.fi", password="test1FI")), 
+            '/login/',
+            data=json.dumps(dict(email="user1@finland.fi", password="test1FI")),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 200)
-        
+
     def test_login_email_error(self):
         response = self.app.post(
-            '/login/', 
-            data=json.dumps(dict(email="invaliduser@finland.fi", password="wrong")), 
+            '/login/',
+            data=json.dumps(dict(email="invaliduser@finland.fi", password="wrong")),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 401)
 
     def test_login_passwd_error(self):
         response = self.app.post(
-            '/login/', 
-            data=json.dumps(dict(email="user1@finland.fi", password="wrong")), 
+            '/login/',
+            data=json.dumps(dict(email="user1@finland.fi", password="wrong")),
             content_type='application/json'
         )
         self.assertEqual(response.status_code, 401)
@@ -53,14 +66,11 @@ class TestAuth(unittest.TestCase):
 
 class TestEndpoints(unittest.TestCase):
     def setUp(self):
-        app.config['TESTING'] = True
-        app.config['DEBUG'] = True
-        app.config['JWT_SECRET_KEY'] = 'TESTING'
-
         self.app = app.test_client()
+
         response = self.app.post(
-            '/login/', 
-            data=json.dumps(dict(email="user1@finland.fi", password="test1FI")), 
+            '/login/',
+            data=json.dumps(dict(email="user1@finland.fi", password="test1FI")),
             content_type='application/json'
         )
         self.access_token = json.loads(response.data)['access_token']
@@ -70,7 +80,7 @@ class TestEndpoints(unittest.TestCase):
 
     def test_feed(self):
         response = self.app.get(
-            '/products/', 
+            '/products/',
             headers={"Authorization": "Bearer " + self.access_token}
         )
         self.assertEqual(response.status_code, 200)
@@ -81,7 +91,7 @@ class TestEndpoints(unittest.TestCase):
 
     def test_get_product(self):
         response = self.app.get(
-            '/products/13', 
+            '/products/13',
             headers={"Authorization": "Bearer " + self.access_token}
         )
         self.assertEqual(response.status_code, 200)
@@ -116,14 +126,14 @@ class TestEndpoints(unittest.TestCase):
 
     def test_like_own_product_error(self):
         response = self.app.post(
-            '/products/1/like', 
+            '/products/1/like',
             headers={"Authorization": "Bearer " + self.access_token}
         )
         self.assertEqual(response.status_code, 400)
 
     def test_sorted_feed_by_price(self):
         response = self.app.get(
-            '/products/?sort=price&order=DESC', 
+            '/products/?sort=price&order=DESC',
             headers={"Authorization": "Bearer " + self.access_token}
         )
         self.assertEqual(response.status_code, 200)
@@ -134,7 +144,7 @@ class TestEndpoints(unittest.TestCase):
 
     def test_feed_with_filters(self):
         response = self.app.get(
-            '/products/?min_price=10&max_price=30&country=FI', 
+            '/products/?min_price=10&max_price=30&country=FI',
             headers={"Authorization": "Bearer " + self.access_token}
         )
         self.assertEqual(response.status_code, 200)
@@ -148,69 +158,65 @@ class TestEndpoints(unittest.TestCase):
 
 class TestLikes(unittest.TestCase):
     def setUp(self):
-        app.config['TESTING'] = True
-        app.config['DEBUG'] = True
-        app.config['JWT_SECRET_KEY'] = 'TESTING'
-
         self.app = app.test_client()
 
         # User 1 logs in and likes stuff
         response = self.app.post(
-            '/login/', 
-            data=json.dumps(dict(email="user1@finland.fi", password="test1FI")), 
+            '/login/',
+            data=json.dumps(dict(email="user1@finland.fi", password="test1FI")),
             content_type='application/json'
         )
-        token1 = json.loads(response.data)['access_token']       
+        token1 = json.loads(response.data)['access_token']
         self.app.post(
-            '/products/13/like', 
+            '/products/13/like',
             headers={"Authorization": "Bearer " + token1}
         )
         self.app.post(
-            '/products/3/like', 
+            '/products/3/like',
             headers={"Authorization": "Bearer " + token1}
         )
         self.app.post(
-            '/products/17/like', 
+            '/products/17/like',
             headers={"Authorization": "Bearer " + token1}
         )
 
         # User 2 logs in and likes stuff
         response = self.app.post(
-            '/login/', 
-            data=json.dumps(dict(email="user2@finland.fi", password="test2FI")), 
+            '/login/',
+            data=json.dumps(dict(email="user2@finland.fi", password="test2FI")),
             content_type='application/json'
         )
-        token2 = json.loads(response.data)['access_token']       
+        token2 = json.loads(response.data)['access_token']
         self.app.post(
-            '/products/13/like', 
+            '/products/13/like',
             headers={"Authorization": "Bearer " + token2}
         )
         self.app.post(
-            '/products/17/like', 
+            '/products/17/like',
             headers={"Authorization": "Bearer " + token2}
         )
 
         # User 3 logs in and likes stuff
         response = self.app.post(
-            '/login/', 
-            data=json.dumps(dict(email="user3@finland.fi", password="test3FI")), 
+            '/login/',
+            data=json.dumps(dict(email="user3@finland.fi", password="test3FI")),
             content_type='application/json'
         )
-        token3 = json.loads(response.data)['access_token']       
+        token3 = json.loads(response.data)['access_token']
         self.app.post(
-            '/products/17/like', 
+            '/products/17/like',
             headers={"Authorization": "Bearer " + token3}
         )
 
         # We'll use user1 for the test
         self.access_token = token1
-    
+
     def tearDown(self):
         pass
 
     def test_sorted_feed_by_likes(self):
         response = self.app.get(
-            '/products/?sort=likes&order=DESC', 
+            '/products/?sort=likes&order=DESC',
             headers={"Authorization": "Bearer " + self.access_token}
         )
         self.assertEqual(response.status_code, 200)
@@ -221,10 +227,10 @@ class TestLikes(unittest.TestCase):
 
         self.assertEqual(feed[1]['id'], 13)
         self.assertEqual(feed[1]['likes'], 2)
-        
+
         self.assertEqual(feed[2]['id'], 3)
         self.assertEqual(feed[2]['likes'], 1)
-    
+
 
 
 if __name__ == "__main__":

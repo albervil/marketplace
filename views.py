@@ -7,6 +7,7 @@ from flask_jwt_extended import (
 )
 
 from exception.restrictions import LikeOwnItemException
+from sqlalchemy.orm.exc import NoResultFound
 
 import services.product_service as Products
 import services.users_service as Users
@@ -44,7 +45,7 @@ class Login(Resource):
                 }
             else:
                 return 'The credentials provided were invalid', 401
-        except StopIteration:
+        except NoResultFound:
             return 'No user with those credentials was found', 401
 
 

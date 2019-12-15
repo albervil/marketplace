@@ -6,7 +6,7 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     description = db.Column(db.String, nullable=False)
-    price = db.Column(db.Integer, nullable=False)
+    price = db.Column(db.Float, nullable=False)
     seller = db.relationship('User', backref='products', lazy=True)
     likes = db.relationship('Like', backref='product', lazy=True)
 
