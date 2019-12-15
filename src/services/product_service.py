@@ -1,11 +1,10 @@
 import json
-from exception.restrictions import LikeOwnItemException
-from services.currency_conversion_service import convert
+from src.exception.restrictions import LikeOwnItemException
+from src.services.currency_conversion_service import convert
 from sqlalchemy.exc import IntegrityError
+from src.models import Product, User, Like
 
 def feed(user, filters, sorting):
-    from models.models import Product, User
-
     products = Product.query.join(User).filter(Product.user_id != user.id)
 
     if filters['country']:
@@ -25,8 +24,6 @@ def feed(user, filters, sorting):
         return feed
 
 def get(user, id):
-    from models.models import Product
-
     product = Product.query.get(id)
 
     if product is None:
@@ -35,7 +32,7 @@ def get(user, id):
         return extend(product, user)
 
 def like(user, id):
-    from models.models import Product, Like, db
+    from src.models import db
 
     product = Product.query.get(id)
 

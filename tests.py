@@ -3,7 +3,7 @@ import unittest
 from app import app
 import json
 from flask_migrate import migrate, upgrade
-from models.models import Product, User, Like, db as models_db
+from src.models import Product, User, Like, db as models_db
 from populate import populatedb
 
 def setUpModule():

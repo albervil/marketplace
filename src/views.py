@@ -6,11 +6,11 @@ from flask_jwt_extended import (
     get_jwt_identity
 )
 
-from exception.restrictions import LikeOwnItemException
+from src.exception.restrictions import LikeOwnItemException
 from sqlalchemy.orm.exc import NoResultFound
 
-import services.product_service as Products
-import services.users_service as Users
+import src.services.product_service as Products
+import src.services.users_service as Users
 
 api = Api(app, version='1.0')
 jwt = JWTManager(app)

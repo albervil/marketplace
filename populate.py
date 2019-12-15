@@ -1,5 +1,5 @@
 from app import db, bcrypt
-import models.models as models
+import src.models as models
 
 import json
 

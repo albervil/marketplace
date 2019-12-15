@@ -15,7 +15,7 @@ else:
     # Just a random string to run the application e.g. locally
     app.config['JWT_SECRET_KEY'] = os.urandom(12)
 
-from views import *
+from src.views import *
 
 
 if __name__ == '__main__':
