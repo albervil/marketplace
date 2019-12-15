@@ -1,64 +1,75 @@
 import json
-import services.users_service as Users
 from exception.restrictions import LikeOwnItemException
 from services.currency_conversion_service import convert
-
-likes = {}
-with open('resources/products.json') as f:
-    products = json.load(f)
-
+from sqlalchemy.exc import IntegrityError
 
 def feed(user, filters, sorting):
+    from models.models import Product, User
+
+    products = Product.query.join(User).filter(Product.user_id != user.id)
+
+    if filters['country']:
+        products = products.filter(User.country == filters['country'])
+
     feed = [
-        extend(product, user) for product in products \
-        if (product['user'] != user['id'] \
-        and pass_filters(extend(product, user), filters))
+        extend(product, user) for product in products.all() \
+        if pass_price_filters(extend(product, user), filters)
     ]
+
     sort_field = sorting['sort']
 
     if sorting['sort']:
-        desc_sort = sorting['order'] is not None and sorting['order'] == 'DESC' 
+        desc_sort = sorting['order'] is not None and sorting['order'] == 'DESC'
         return sorted(feed, key=lambda prod: prod[sort_field], reverse=desc_sort)
     else:
         return feed
 
 def get(user, id):
-    product = next(prod for prod in products if prod['id'] == id)
-    return extend(product, user)
+    from models.models import Product
 
-def like(user, product):
-    if user['id'] == product['user']:
+    product = Product.query.get(id)
+
+    if product is None:
+        return None
+    else:
+        return extend(product, user)
+
+def like(user, id):
+    from models.models import Product, Like, db
+
+    product = Product.query.get(id)
+
+    if product is None:
+        return None
+
+    if user.id == product.user_id:
         raise LikeOwnItemException()
 
-    if product['id'] in likes.keys():
-        likes[product['id']].add(user['id'])
-    else:
-        likes[product['id']] = {user['id']}
-    
-    product['likes'] = get_product_likes(product['id'])
-    return product
+    lk = Like(user.id, id)
+    try:
+        db.session.add(lk)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()
+
+    return get(user, id)
 
 
 def extend(product, buyer):
-    seller = Users.get(product['user'])
-    product_currency = seller['currency']
-    convert_from_eur = (product_currency == 'EUR')
+    price = product.price if buyer.currency == product.seller.currency \
+                    else convert(
+                        product.price, product.seller.currency, buyer.currency
+                    )
+    return {
+        'id': product.id,
+        'user_id': product.user_id,
+        'description': product.description,
+        'country': product.seller.country,
+        'price': price,
+        'likes': len(product.likes)
+    }
 
-    price = product['price'] if buyer['currency'] == product_currency \
-                            else convert(
-                                product['price'], product_currency, buyer['currency']
-                            ) 
-
-    result = product.copy()
-
-    result['country'] = seller['country']
-    result['price'] = price 
-    result['likes'] = get_product_likes(product['id'])
-    return result
-
-def pass_filters(product, filters):
-    if filters['country'] and product['country'] != filters['country']:
-        return False
+def pass_price_filters(product, filters):
     if filters['min_price'] and product['price'] < filters['min_price']:
         return False
     if filters['max_price'] and product['price'] > filters['max_price']:

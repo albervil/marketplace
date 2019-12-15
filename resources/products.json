@@ -55,55 +55,55 @@
     },
     {
         "id": 10,
-        "user": 11,
+        "user": 4,
         "description": "RayBan Sunglasses",
         "price": 300.00
     },
     {
         "id": 11,
-        "user": 12,
+        "user": 5,
         "description": "Longchamp handbag",
         "price": 2999.00
     },
     {
         "id": 12,
-        "user": 13,
+        "user": 6,
         "description": "Strappy sandals",
         "price": 350.00
     },
     {
         "id": 13,
-        "user": 11,
+        "user": 4,
         "description": "Basketball shirt",
         "price": 279.95
     },
     {
         "id": 14,
-        "user": 12,
+        "user": 5,
         "description": "Party dress",
         "price": 560.00
     },
     {
         "id": 15,
-        "user": 13,
+        "user": 6,
         "description": "Winter parka",
         "price": 380.00
     },
     {
         "id": 16,
-        "user": 11,
+        "user": 4,
         "description": "Nike trainers",
         "price": 495.00
     },
     {
         "id": 17,
-        "user": 12,
+        "user": 5,
         "description": "Striped scarf",
         "price": 159.00
     },
     {
         "id": 18,
-        "user": 13,
+        "user": 6,
         "description": "Woolen hat",
         "price": 99.00
     }

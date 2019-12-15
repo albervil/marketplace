@@ -1,16 +1,19 @@
 import json
-from werkzeug.security import safe_str_cmp
+from app import bcrypt
 
 with open('resources/users.json') as f:
     users = json.load(f)
 
 def get(id):
-    return next(user for user in users if user['id'] == id)
+    from models.models import User
 
-def get_by_email(email):
-    return next(user for user in users if user['email'] == email)
+    user = User.query.get(id)
+    return user
 
 def authenticate(payload):
-    user = get_by_email(payload['email'])
-    if user and safe_str_cmp(user['password'], payload['password']):
+    from models.models import User
+
+    user = User.query.filter(User.email == payload['email']).one()
+
+    if user and bcrypt.check_password_hash(user.pw_hash, payload['password']):
         return user

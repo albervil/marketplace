@@ -1,6 +1,9 @@
 import os
 from flask import Flask, jsonify
 from flask_restplus import Api, Resource, fields
+from flask_sqlalchemy import SQLAlchemy
+from flask_bcrypt import Bcrypt
+
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_identity
@@ -12,6 +15,10 @@ import services.product_service as Products
 import services.users_service as Users
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres+psycopg2://albv:mysecretpassword@localhost:5432/postgres'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+bcrypt = Bcrypt(app)
 
 if 'APP_SECRET' in os.environ:
     app.config['JWT_SECRET_KEY'] = os.environ['APP_SECRET']
@@ -47,7 +54,7 @@ class Login(Resource):
             user = Users.authenticate(api.payload)
 
             if user:
-                access_token = create_access_token(identity=user['id'])
+                access_token = create_access_token(identity=user.id)
                 return {
                     "access_token": access_token
                 }
@@ -69,7 +76,7 @@ class Feed(Resource):
     filters_parser.add_argument('country', help='Country to filter by')
     filters_parser.add_argument('min_price', help='Minimum price to filter by', type=int)
     filters_parser.add_argument('max_price', help='Maximum price to filter by', type=int)
-    
+
     sorting_parser = api.parser()
     sorting_parser.add_argument('sort', help='Criteria to sort by (price or likes)', choices=('price', 'likes'),)
     sorting_parser.add_argument('order', help='Order to sort by (ASC or DESC)', choices=('ASC', 'DESC'),)
@@ -80,7 +87,7 @@ class Feed(Resource):
         """
         Shows the product feed for the user.
         """
-        user_id = get_jwt_identity();
+        user_id = get_jwt_identity()
         user = Users.get(user_id)
 
         filters = self.filters_parser.parse_args()
@@ -101,12 +108,14 @@ class Product(Resource):
         """
         Shows details of an individual product.
         """
-        user_id = get_jwt_identity();
+        user_id = get_jwt_identity()
         user = Users.get(user_id)
 
-        try:
+        product = Products.get(user, id)
+
+        if product is not None:
             return Products.get(user, id)
-        except StopIteration:
+        else:
             return 'Not Found', 404
 
 @products.route("/<int:id>/like")
@@ -120,23 +129,28 @@ class Product(Resource):
 )
 @products.expect(header_parser)
 class Like(Resource):
-    
+
     @jwt_required
     def post(self, id):
         """
         Likes the selected product.
         """
-        user_id = get_jwt_identity();
+        user_id = get_jwt_identity()
         user = Users.get(user_id)
 
         try:
-            product = Products.get(user, id)
-            return Products.like(user, product)
+            product = Products.like(user, id)
+
+            if product is not None:
+                return product
+            else:
+                return 'Not Found', 404
         except LikeOwnItemException:
             return 'Cannot like own items', 400
-        except StopIteration:
-            return 'Not Found', 404
 
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    from populate import populatedb
+
+    populatedb()
+    app.run(debug=True)

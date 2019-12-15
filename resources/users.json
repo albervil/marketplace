@@ -21,21 +21,21 @@
         "currency": "EUR"
     },
     {
-        "id": 11,
+        "id": 4,
         "email": "user1@denmark.dk",
         "password": "test1DK",
         "country": "DK",
         "currency": "DKK"
     },
     {
-        "id": 12,
+        "id": 5,
         "email": "user2@denmark.dk",
         "password": "test2DK",
         "country": "DK",
         "currency": "DKK"
     },
     {
-        "id": 13,
+        "id": 6,
         "email": "user3@denmark.dk",
         "password": "test3DK",
         "country": "DK",

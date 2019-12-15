@@ -8,6 +8,11 @@ flask = "*"
 flask-restplus = "*"
 requests = "*"
 flask-jwt-extended = "*"
+flask-sqlalchemy = "*"
+flask-migrate = "*"
+psycopg2 = "*"
+flask-script = "*"
+flask-bcrypt = "*"
 
 [dev-packages]
 
